@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Pesanan</title>
+    <link rel="stylesheet" href="tugas3.css">
+</head>
+<body>
+    <h2>Daftar Produk</h2>
+    <ul id="produkList"></ul>
+    
+    <h2>Tambah Produk</h2>
+    <input type="text" id="namaProduk" placeholder="Nama Produk">
+    <input type="number" id="hargaProduk" placeholder="Harga">
+    <input type="number" id="stokProduk" placeholder="Stok">
+    <button onclick="tambahProduk()">Tambah Produk</button>
+    
+    <h2>Hapus Produk</h2>
+    <input type="number" id="idHapusProduk" placeholder="ID Produk">
+    <button onclick="hapusProduk()">Hapus Produk</button>
+    
+    <h2>Tambah Pelanggan</h2>
+    <input type="text" id="namaPelanggan" placeholder="Nama Pelanggan">
+    <button onclick="tambahPelanggan()">Tambah Pelanggan</button>
+    
+    <h2>Buat Pesanan</h2>
+    <input type="number" id="idPelanggan" placeholder="ID Pelanggan">
+    <input type="number" id="idProduk" placeholder="ID Produk">
+    <input type="number" id="jumlah" placeholder="Jumlah">
+    <button onclick="buatPesanan()">Pesan</button>
+    
+    <h2>Daftar Pelanggan & Pesanan</h2>
+    <ul id="pelangganList"></ul>
+
+    <script>
+        // Daftar produk yang tersedia di toko
+        let produkToko = [
+    { id: "0001", nama: "Laptop", harga: 7000000, stok: 5 },
+    { id: "0002", nama: "Mouse", harga: 200000, stok: 10 },
+    { id: "0003", nama: "Keyboard", harga: 350000, stok: 7 }
+];
+
+        // Daftar pelanggan yang sudah terdaftar
+        let pelanggan = [];
+
+
+        // Fungsi untuk menampilkan daftar produk di halaman
+        function tampilkanProduk() {
+            let list = document.getElementById("produkList"); // Mengambil elemen HTML dengan id "produkList"
+            list.innerHTML = "";// Mengosongkan daftar sebelum diperbarui
+            
+            // Mengulang semua produk yang ada dan menambahkannya ke daftar
+            produkToko.forEach(produk => {
+                list.innerHTML += `<li>ID: ${produk.id}, ${produk.nama} - Rp${produk.harga} (Stok: ${produk.stok})</li>`;
+            });
+        }
+
+        // Fungsi untuk menambahkan produk baru ke daftar
+        function tambahProduk() {
+            let nama = document.getElementById("namaProduk").value; // Mengambil nilai dari input nama produk
+            let harga = parseInt(document.getElementById("hargaProduk").value); // Mengambil nilai harga dan mengubahnya menjadi angka
+            let stok = parseInt(document.getElementById("stokProduk").value); // Mengambil nilai stok dan mengubahnya menjadi angka
+
+            // Jika ada input yang kosong, tampilkan peringatan
+            if (!nama || !harga || !stok) return alert("Semua data harus diisi!");
+
+            // Buat ID baru dengan format 4 digit angka (misal: 0004, 0005)
+            let idBaru = String(produkToko.length + 1).padStart(4, "0"); // Membuat ID baru berdasarkan jumlah produk yang ada
+            produkToko.push({ id: idBaru, nama, harga, stok }); // Menambahkan produk ke daftar
+            alert("Produk berhasil ditambahkan!"); // Menampilkan notifikasi
+            tampilkanProduk(); // Memperbarui tampilan daftar produk
+        }
+
+        // Fungsi untuk menghapus produk berdasarkan ID
+        function hapusProduk() {
+            let id = document.getElementById("idHapusProduk").value;  // Mengambil ID produk dari input dan mengubahnya ke angka
+            let index = produkToko.findIndex(p => p.id === id);     // Mencari indeks produk berdasarkan ID
+            // Jika produk tidak ditemukan, tampilkan peringatan            
+            if (index === -1) return alert("Produk tidak ditemukan!");
+            produkToko.splice(index, 1); // Menghapus produk dari daftar
+            alert("Produk berhasil dihapus!"); // Menampilkan notifikasi
+            tampilkanProduk(); // Memperbarui daftar produk
+        }
+
+        // Fungsi untuk menambahkan pelanggan baru
+        function tambahPelanggan() {
+            let nama = document.getElementById("namaPelanggan").value;  // Mengambil nilai dari input nama pelanggan
+            // Jika input kosong, tampilkan peringatan
+            if (nama.trim() === "") return alert("Nama tidak boleh kosong!");
+            let idBaru = pelanggan.length + 1; // Membuat ID baru berdasarkan jumlah pelanggan yang ada
+            pelanggan.push({ id: idBaru, nama, pesanan: [] }); // Menambahkan pelanggan ke daftar
+            alert(`Pelanggan ${nama} berhasil ditambahkan!`); // Menampilkan notifikasi
+            tampilkanPelanggan(); // Memperbarui daftar pelanggan
+        }
+
+        // Fungsi untuk membuat pesanan pelanggan
+function buatPesanan() {
+    let idPelanggan = parseInt(document.getElementById("idPelanggan").value); // Mengambil ID pelanggan dari input
+    let idProduk = document.getElementById("idProduk").value; // Mengambil ID produk dari input
+    let jumlah = parseInt(document.getElementById("jumlah").value); // Mengambil jumlah pesanan dari input
+
+    let pelangganData = pelanggan.find(p => p.id === idPelanggan); // Mencari pelanggan berdasarkan ID
+    let produkData = produkToko.find(p => p.id === idProduk); // Mencari produk berdasarkan ID
+
+    // Jika pelanggan tidak ditemukan, tampilkan peringatan
+    if (!pelangganData) return alert("Pelanggan tidak ditemukan!");
+    
+    // Jika produk tidak ditemukan, tampilkan peringatan
+    if (!produkData) return alert("Produk tidak ditemukan!");
+
+    // Jika stok produk kurang dari jumlah pesanan, tampilkan peringatan
+    if (produkData.stok < jumlah) return alert("Stok tidak mencukupi!");
+
+    produkData.stok -= jumlah; // Mengurangi stok produk sesuai jumlah pesanan
+    pelangganData.pesanan.push({ nama: produkData.nama, jumlah, total: produkData.harga * jumlah }); // Menambahkan pesanan ke pelanggan
+
+    alert("Pesanan berhasil dibuat!"); // Menampilkan notifikasi
+    tampilkanProduk(); // Memperbarui daftar produk
+    tampilkanPelanggan(); // Memperbarui daftar pelanggan
+}
+
+// Fungsi untuk menampilkan daftar pelanggan dan pesanan mereka
+function tampilkanPelanggan() {
+    let list = document.getElementById("pelangganList"); // Mengambil elemen HTML dengan id "pelangganList"
+    list.innerHTML = ""; // Mengosongkan daftar sebelum diperbarui
+
+    // Mengulang semua pelanggan dan menampilkan informasi mereka
+    pelanggan.forEach(p => {
+        let pesananList = p.pesanan.map(pesanan => `<li>${pesanan.nama} - ${pesanan.jumlah} pcs (Rp${pesanan.total})</li>`).join(" ");
+        list.innerHTML += `<li>ID: ${p.id}, ${p.nama} <ul>${pesananList}</ul></li>`;
+    });
+}
+
+// Memanggil fungsi untuk menampilkan daftar produk saat halaman pertama kali dimuat
+tampilkanProduk();
+    </script>
+</body>
+</html>
